@@ -11,7 +11,10 @@
 # 5) traduire la suite d'acide-aminé en abréviation
 # 6) afficher avec turtle
 
-from bioInfo import adn
+from bioInfo import adn as dna
+from bioInfo import codons_aa as amino_acids_template
+from bioInfo import lettreAa as amino_acids_letters
+from turtle import *
 
 def get_reverse_complement(dna):
     reverse_complement = ''
@@ -68,8 +71,59 @@ def get_genes(dna, genes_coordinates):
         genes.append(dna[start:end+3])
     return genes
 
+def get_arn_sequence(gene):
+    arn = ''
+    for nucleotide in gene:
+        if nucleotide == 'A':  arn += 'U'
+        elif nucleotide == 'T': arn += 'A'
+        elif nucleotide == 'C': arn += 'G'
+        elif nucleotide == 'G': arn += 'C'
+        else: raise ValueError
+    return arn
+
+def get_amino_acids(gene):
+    amino_acids_chain = []
+    for i in range(0, len(gene), 3):
+        amino_acids_chain.append(
+            gene[i] + gene[i+1] + gene[i+2]
+        )
+    return amino_acids_chain
+
+def get_amino_acids_chain(gene):
+    amino_acids = get_amino_acids(gene)
+    amino_acids_chain = []
+    for amino_acid in amino_acids[:-1]:
+        amino_acids_chain.append(amino_acids_template[amino_acid])
+    return amino_acids_chain
+
+def get_abbreviated_amino_acids_chain(gene):
+    amino_acids = get_amino_acids(gene)
+    amino_acids_names = []
+    for amino_acid in amino_acids[:-1]:
+        amino_acids_names.append(amino_acids_letters[amino_acid])
+    return amino_acids_names
+
+def get_stringify_protein(amino_acids_chain):
+    return '-'.join(amino_acids_chain)
+
+def get_stringify_protein_by_gene(gene):
+    amino_acids_chain = get_amino_acids_chain(gene)
+    return '-'.join(amino_acids_chain)
+
+def draw_protein(amino_acids_chain):
+    x = y = 0
+    for amino_acid in amino_acids_chain:
+        draw_square(x, y, amino_acid)
+
+def draw_square(x, y, amino_acid, side_length=15):
+    goto(x, y), write(amino_acid)
+    goto(x-side_length/2, y-side_length/2)
+    for side in range(4):
+        fd(side_length), lt(90)
+
+
 if __name__ == '__main__':
-    first_dna = adn
+    first_dna = dna
     second_dna = get_reverse_complement(first_dna)
 
     first_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(first_dna),
@@ -79,5 +133,26 @@ if __name__ == '__main__':
 
     first_dna_genes = get_genes(first_dna, first_dna_genes_coordinates)
     second_dna_genes = get_genes(second_dna, second_dna_genes_coordinates)
-    print(get_genes(first_dna, first_dna_genes_coordinates))
+    
+    genes = first_dna_genes + second_dna_genes
 
+    amino_acids_chains_fullname = []
+    amino_acids_chains_shorten = []
+
+    for gene in genes:
+        arn = get_arn_sequence(gene)
+        amino_acids_chains_fullname.append(get_amino_acids_chain(arn))
+        amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain(arn))
+
+    print(amino_acids_chains_fullname)
+    print(amino_acids_chains_shorten)
+
+
+    for amino_acids_chain in amino_acids_chains_fullname:
+        xyz = amino_acids_chain
+        x = get_stringify_protein(amino_acids_chain)
+        print(x)
+
+    draw_protein(amino_acids_chain)
+
+    mainloop()
