@@ -110,26 +110,49 @@ def get_stringify_protein_by_gene(gene):
     amino_acids_chain = get_amino_acids_chain(gene)
     return '-'.join(amino_acids_chain)
 
-def draw_protein(amino_acids_chain):
+def draw_protein(x, y, amino_acids_chain, side_length=15):
+    # x = y = 0
+    # side_length = 15
+    _x, _y = x, y
+    for i, amino_acid in enumerate(amino_acids_chain):
+        if i % 15 == 0 and i != 0:
+            _y -= side_length
+            _x = x
+        draw_square(_x, _y, amino_acid, side_length)
+        _x += side_length
+
+def draw_proteins(amino_acids_chains):
     x = y = 0
-    for amino_acid in amino_acids_chain:
-        draw_square(x, y, amino_acid)
+    for amino_acids_chain in amino_acids_chains:
+        draw_protein(x, y, amino_acids_chain)
+        y = pos()[1] - 20
+
+# def draw_square(x, y, amino_acid, side_length=15):
+#     """For visual studio"""
+#     penup(), goto(x, y), pendown()
+#     write('  '+ amino_acid, move=False, align='left', font=('Arial', 8, 'normal'))
+#     for side in range(4):
+#         fd(side_length), lt(90)
 
 def draw_square(x, y, amino_acid, side_length=15):
-    goto(x, y), write(amino_acid)
-    goto(x-side_length/2, y-side_length/2)
+    """For code boot"""
+    penup(), goto(x+side_length/2, y+side_length/2), write(amino_acid)
+    goto(x,y), pendown()
     for side in range(4):
         fd(side_length), lt(90)
 
 
 if __name__ == '__main__':
+    speed(0)
     first_dna = dna
     second_dna = get_reverse_complement(first_dna)
 
+    # TODO: mettre l'adn et les genes_coordinates dans list[tuple] et faire un map(get_genes, that_list)
+
     first_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(first_dna),
-                                                      get_position_of_ending_codon(first_dna))
+                                                        get_position_of_ending_codon(first_dna))
     second_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(second_dna),
-                                                       get_position_of_ending_codon(second_dna))
+                                                         get_position_of_ending_codon(second_dna))
 
     first_dna_genes = get_genes(first_dna, first_dna_genes_coordinates)
     second_dna_genes = get_genes(second_dna, second_dna_genes_coordinates)
@@ -153,6 +176,6 @@ if __name__ == '__main__':
         x = get_stringify_protein(amino_acids_chain)
         print(x)
 
-    draw_protein(amino_acids_chain)
+    draw_proteins(amino_acids_chains_shorten)
 
     mainloop()
