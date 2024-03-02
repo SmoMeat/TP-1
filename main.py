@@ -31,7 +31,7 @@ def get_reverse_complement(dna):
         elif nucleotide == 'G':
             reverse_complement = 'C' + reverse_complement
         else:
-            raise ValueError
+            raise ValueError ("L'adn contient des caracteres autres que 'A', 'T', 'C' ou 'G'")
 
     return reverse_complement
     
