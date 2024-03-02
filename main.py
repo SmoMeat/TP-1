@@ -63,7 +63,9 @@ def get_genes_coordinates(starting_codons, ending_codons):
 
     return genes_coordinates
 
-def get_genes(dna, genes_coordinates):
+def get_genes(abc):
+    dna = abc['dna']
+    genes_coordinates = abc['genes_position']
     genes = []
     for gene_coordinate in genes_coordinates:
         start = gene_coordinate[0]
@@ -127,37 +129,53 @@ def draw_proteins(amino_acids_chains):
         draw_protein(x, y, amino_acids_chain)
         y = pos()[1] - 20
 
-# def draw_square(x, y, amino_acid, side_length=15):
-#     """For visual studio"""
-#     penup(), goto(x, y), pendown()
-#     write('  '+ amino_acid, move=False, align='left', font=('Arial', 8, 'normal'))
-#     for side in range(4):
-#         fd(side_length), lt(90)
-
 def draw_square(x, y, amino_acid, side_length=15):
-    """For code boot"""
-    penup(), goto(x+side_length/2, y+side_length/2), write(amino_acid)
-    goto(x,y), pendown()
+    """For visual studio"""
+    penup(), goto(x, y), pendown()
+    write('  '+ amino_acid, move=False, align='left', font=('Arial', 8, 'normal'))
     for side in range(4):
         fd(side_length), lt(90)
+
+def get_genes_coordinate_from_dna(dna):
+    return {
+        "dna": dna,
+        "genes_position": get_genes_coordinates(
+            get_position_of_starting_codon(dna),
+            get_position_of_ending_codon(dna)
+        )
+    }
+
+# def draw_square(x, y, amino_acid, side_length=15):
+#     """For code boot"""
+#     penup(), goto(x+side_length/2, y+side_length/2), write(amino_acid)
+#     goto(x,y), pendown()
+#     for side in range(4):
+#         fd(side_length), lt(90)
 
 
 if __name__ == '__main__':
     speed(0)
-    first_dna = dna
-    second_dna = get_reverse_complement(first_dna)
+    # first_dna = dna
+    # second_dna = get_reverse_complement(first_dna)
+
+    dna_strands = [
+        dna,
+        get_reverse_complement(dna)
+    ]
+    genes_coordinates = list(map(get_genes_coordinate_from_dna, dna_strands))
+    genes = list(map(get_genes, genes_coordinates))
 
     # TODO: mettre l'adn et les genes_coordinates dans list[tuple] et faire un map(get_genes, that_list)
 
-    first_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(first_dna),
-                                                        get_position_of_ending_codon(first_dna))
-    second_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(second_dna),
-                                                         get_position_of_ending_codon(second_dna))
+    # first_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(first_dna),
+    #                                                     get_position_of_ending_codon(first_dna))
+    # second_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(second_dna),
+    #                                                      get_position_of_ending_codon(second_dna))
 
-    first_dna_genes = get_genes(first_dna, first_dna_genes_coordinates)
-    second_dna_genes = get_genes(second_dna, second_dna_genes_coordinates)
+    # first_dna_genes = get_genes(first_dna, first_dna_genes_coordinates)
+    # second_dna_genes = get_genes(second_dna, second_dna_genes_coordinates)
     
-    genes = first_dna_genes + second_dna_genes
+    # genes = first_dna_genes + second_dna_genes
 
     amino_acids_chains_fullname = []
     amino_acids_chains_shorten = []
@@ -167,8 +185,8 @@ if __name__ == '__main__':
         amino_acids_chains_fullname.append(get_amino_acids_chain(arn))
         amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain(arn))
 
-    print(amino_acids_chains_fullname)
-    print(amino_acids_chains_shorten)
+    # print(amino_acids_chains_fullname)
+    # print(amino_acids_chains_shorten)
 
 
     for amino_acids_chain in amino_acids_chains_fullname:
@@ -176,6 +194,6 @@ if __name__ == '__main__':
         x = get_stringify_protein(amino_acids_chain)
         print(x)
 
-    draw_proteins(amino_acids_chains_shorten)
+    # draw_proteins(amino_acids_chains_shorten)
 
-    mainloop()
+    # mainloop()
