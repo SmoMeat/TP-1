@@ -14,7 +14,10 @@
 from bioInfo import adn as dna
 from bioInfo import codons_aa as amino_acids_template
 from bioInfo import lettreAa as amino_acids_letters
+from turtle import pu as penup
+from turtle import pd as pendown
 from turtle import *
+
 
 def get_reverse_complement(dna):
     reverse_complement = ''
@@ -63,9 +66,9 @@ def get_genes_coordinates(starting_codons, ending_codons):
 
     return genes_coordinates
 
-def get_genes(abc):
-    dna = abc['dna']
-    genes_coordinates = abc['genes_position']
+def get_genes(dna, genes_coordinates):
+    #dna = abc['dna']
+    #genes_coordinates = abc['genes_position']
     genes = []
     for gene_coordinate in genes_coordinates:
         start = gene_coordinate[0]
@@ -124,58 +127,59 @@ def draw_protein(x, y, amino_acids_chain, side_length=15):
         _x += side_length
 
 def draw_proteins(amino_acids_chains):
-    x = y = 0
+    x = -112.5 ; y = 300
     for amino_acids_chain in amino_acids_chains:
         draw_protein(x, y, amino_acids_chain)
-        y = pos()[1] - 20
+        if is_codeboot(): y -= 150
+        else: y = pos()[1] - 20
+        
+def get_genes_by_coordinate(branchs):
+    genes = []
+    for branch in branchs:
+        for gene in get_genes(branch['dna'], branch['genes_positions']):
+            genes.append(gene)
+    return genes
 
-def draw_square(x, y, amino_acid, side_length=15):
-    """For visual studio"""
-    penup(), goto(x, y), pendown()
-    write('  '+ amino_acid, move=False, align='left', font=('Arial', 8, 'normal'))
-    for side in range(4):
-        fd(side_length), lt(90)
 
 def get_genes_coordinate_from_dna(dna):
     return {
         "dna": dna,
-        "genes_position": get_genes_coordinates(
+        "genes_positions": get_genes_coordinates(
             get_position_of_starting_codon(dna),
             get_position_of_ending_codon(dna)
         )
     }
 
-# def draw_square(x, y, amino_acid, side_length=15):
-#     """For code boot"""
-#     penup(), goto(x+side_length/2, y+side_length/2), write(amino_acid)
-#     goto(x,y), pendown()
-#     for side in range(4):
-#         fd(side_length), lt(90)
+def draw_square(x, y, amino_acid, side_length=15):
+    if is_codeboot():
+        penup(), goto(x+side_length/2, y+side_length/2), write(amino_acid)
+        goto(x,y), pendown()
+        for side in range(4):
+            fd(side_length), lt(90)
+    else:
+        penup(), goto(x, y), pendown()
+        write('  '+ amino_acid, move=False, align='left', font=('Arial', 8, 'normal'))
+        for side in range(4):
+            fd(side_length), lt(90)
+
+def is_codeboot():
+    try:
+        import sys
+        return False
+    except:
+        return True
 
 
 if __name__ == '__main__':
-    speed(0)
-    # first_dna = dna
-    # second_dna = get_reverse_complement(first_dna)
+    clear(800, 600) if is_codeboot() else speed(0)
 
     dna_strands = [
         dna,
         get_reverse_complement(dna)
     ]
+
     genes_coordinates = list(map(get_genes_coordinate_from_dna, dna_strands))
-    genes = list(map(get_genes, genes_coordinates))
-
-    # TODO: mettre l'adn et les genes_coordinates dans list[tuple] et faire un map(get_genes, that_list)
-
-    # first_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(first_dna),
-    #                                                     get_position_of_ending_codon(first_dna))
-    # second_dna_genes_coordinates = get_genes_coordinates(get_position_of_starting_codon(second_dna),
-    #                                                      get_position_of_ending_codon(second_dna))
-
-    # first_dna_genes = get_genes(first_dna, first_dna_genes_coordinates)
-    # second_dna_genes = get_genes(second_dna, second_dna_genes_coordinates)
-    
-    # genes = first_dna_genes + second_dna_genes
+    genes = get_genes_by_coordinate(genes_coordinates)
 
     amino_acids_chains_fullname = []
     amino_acids_chains_shorten = []
@@ -194,6 +198,6 @@ if __name__ == '__main__':
         x = get_stringify_protein(amino_acids_chain)
         print(x)
 
-    # draw_proteins(amino_acids_chains_shorten)
+    draw_proteins(amino_acids_chains_shorten)
 
-    # mainloop()
+    mainloop() if not is_codeboot() else None
