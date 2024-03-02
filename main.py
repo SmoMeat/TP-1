@@ -17,6 +17,7 @@ from bioInfo import lettreAa as amino_acids_letters
 from turtle import pu as penup
 from turtle import pd as pendown
 from turtle import *
+import math
 
 
 def get_reverse_complement(dna):
@@ -36,6 +37,13 @@ def get_reverse_complement(dna):
     return reverse_complement
     
 def get_position_of_starting_codon(dna):
+    """Trouve dans un brin d'adn la position de tous les codons de début ('TAC')
+
+    Args:
+        dna (str): l'adn sous forme de string (suite de A, T, C, G)
+    Returns:
+        starting_codon_position (list[int]): liste avec la position de tous les codons de débuts
+    """
     starting_codon_position = []
     for i in range(len(dna)-2):
         codon = dna[i] + dna[i+1] + dna[i+2]
@@ -44,6 +52,13 @@ def get_position_of_starting_codon(dna):
     return starting_codon_position
 
 def get_position_of_ending_codon(dna):
+    """Trouve dans un brin d'adn la position de tous les codons de fin ('ATT', 'ATC, 'ACT')
+
+    Args:
+        dna (str): l'adn sous forme de string (suite de A, T, C, G)
+    Returns:
+        ending_codon_position (list[int]): liste avec la position de tous les codons de fin
+    """
     starting_codon_position = []
     for i in range(len(dna)-2):
         codon = dna[i] + dna[i+1] + dna[i+2]
@@ -52,6 +67,14 @@ def get_position_of_ending_codon(dna):
     return starting_codon_position
 
 def get_genes_coordinates(starting_codons, ending_codons):
+    """Trouve la position de tous les gènes valides parmis plusieurs couples possibles
+    
+    Args:
+        starting_codons (list): les positions avec le codon de début 'TAC'
+        ending_codons (list): les positions avec les codons de fin 'ATT', 'ATC', 'ACT'
+    Returns
+        genes_coordinates (list[tuple]): liste contenant tous les couples de gènes valides
+    """
     genes_coordinates = []
     for starting_codon in starting_codons:
         for ending_codon in ending_codons:
@@ -63,12 +86,18 @@ def get_genes_coordinates(starting_codons, ending_codons):
                 break
         else:
             continue
-
+    
     return genes_coordinates
 
 def get_genes(dna, genes_coordinates):
-    #dna = abc['dna']
-    #genes_coordinates = abc['genes_position']
+    """Renvoie tous les gènes d'un brin d'adn
+
+    Args:
+        dna (str): l'adn sous forme de string (suite de A, T, C, G)
+        genes_coordinates (list[tuple]): positions (début, fin) de tous les gènes valides
+    Returns:
+        genes (list[str]): contient tous les gènes sous forme d'ADN
+    """
     genes = []
     for gene_coordinate in genes_coordinates:
         start = gene_coordinate[0]
@@ -116,8 +145,15 @@ def get_stringify_protein_by_gene(gene):
     return '-'.join(amino_acids_chain)
 
 def draw_protein(x, y, amino_acids_chain, side_length=15):
-    # x = y = 0
-    # side_length = 15
+    """Permet de dessiner une suite d'acides aminés avec Turtle
+    Args:
+        x (float): Position horizontale où la protéine doit etre dessiné
+        y (float): Position verticale où la protéine doit etre dessiné
+        amino_acids_chain (str): La suite d'acides aminés abrégés qui forme la protéine
+        side_length (int): La taille des carrés représentant un acide aminé (défautl=15)
+    Returns:
+        None
+    """
     _x, _y = x, y
     for i, amino_acid in enumerate(amino_acids_chain):
         if i % 15 == 0 and i != 0:
@@ -127,21 +163,45 @@ def draw_protein(x, y, amino_acids_chain, side_length=15):
         _x += side_length
 
 def draw_proteins(amino_acids_chains):
+    """Permet de dessiner plusieurs suites d'acides aminés avec Turtle une à la suite de l'autre
+    Args:
+        amino_acids_chains (list): Les suites d'acides aminés abrégés qui forme les protéines
+    Returns:
+        None
+    """
     x = -112.5 ; y = 300
     for amino_acids_chain in amino_acids_chains:
         draw_protein(x, y, amino_acids_chain)
-        if is_codeboot(): y -= 150
-        else: y = pos()[1] - 20
+        if is_codeboot(): y -= 15 * (len(amino_acids_chain) // 15) + 50
+        else: y = ycor() - 50
         
 def get_genes_by_coordinate(branchs):
+    """Trouve la séquence de nucléotide d'un gènes à partir de plusieurs brins
+    
+    Args:
+        branchs (list[{
+            'dna': str,
+            'genes_positions': list[tuple]
+        }]): contient plusieurs brins d'adn et les couples de position de gènes associés
+    Returns:
+        genes (list[str]): les gènes représentés sous forme de suite de nucléotide
+    """
     genes = []
     for branch in branchs:
         for gene in get_genes(branch['dna'], branch['genes_positions']):
             genes.append(gene)
+
     return genes
 
 
 def get_genes_coordinate_from_dna(dna):
+    """Trouve toutes les positions de gènes sur un brin d'ADN donné
+
+    Args:
+        dna (str): l'adn sous forme de string (suite de A, T, C, G)
+    Returns:
+        ? (dict): contient le brin d'adn utilisé et les couples de positions de gènes 
+    """
     return {
         "dna": dna,
         "genes_positions": get_genes_coordinates(
@@ -151,6 +211,16 @@ def get_genes_coordinate_from_dna(dna):
     }
 
 def draw_square(x, y, amino_acid, side_length=15):
+    """Dessine un carré avec une lettre à l'intérieur
+
+    Args:
+        x (float): Position horizontale où le carré doit etre dessiné
+        y (float): Position verticale où le carré doit etre dessiné
+        amino_acid (str): La lettre représentant l'acide aminé
+        side_length (int): La taille du carré représentant un acide aminé (défautl=15)
+    Returns:
+        None
+    """
     if is_codeboot():
         penup(), goto(x+side_length/2, y+side_length/2), write(amino_acid)
         goto(x,y), pendown()
@@ -163,6 +233,7 @@ def draw_square(x, y, amino_acid, side_length=15):
             fd(side_length), lt(90)
 
 def is_codeboot():
+    """Renvoie True si l'interpréteur utilisé est CodeBoot"""
     try:
         import sys
         return False
