@@ -21,6 +21,13 @@ import math
 
 
 def get_reverse_complement(dna):
+    """Génère le brin inversé avec les nucléotides complémentaires
+
+    Args:
+        dna (str): l'adn sous forme de string (suite de A, T, C, G)
+    Returns:
+        reverse_complement (str): le 2e brin d'adn complémentaire et inversé
+    """
     reverse_complement = ''
     for nucleotide in dna.upper():
         if nucleotide == 'A':
@@ -106,6 +113,13 @@ def get_genes(dna, genes_coordinates):
     return genes
 
 def get_arn_sequence(gene):
+    """Transforme une séquence d'ADN (un gène) en ARN
+
+    Args:
+        gene (str): gène représenté en adn (suite de A, T, C, G)
+    Returns:
+        arn (str): gène représenté en arn (suite de U, A, G, C)
+    """
     arn = ''
     for nucleotide in gene:
         if nucleotide == 'A':  arn += 'U'
@@ -113,21 +127,40 @@ def get_arn_sequence(gene):
         elif nucleotide == 'C': arn += 'G'
         elif nucleotide == 'G': arn += 'C'
         else: raise ValueError
+
     return arn
 
 def get_amino_acids(gene):
+    """_summary_
+
+    Args:
+        gene (str): gène représenté en arn (suite de U, A, G, C)
+    Returns:
+        amino_acids_chain (list[str]): liste de séquences d'acides aminés sous forme de triplet de nucléotide (ex: ['AUG', 'GGU', 'UAG'])
+    """
     amino_acids_chain = []
+
     for i in range(0, len(gene), 3):
         amino_acids_chain.append(
             gene[i] + gene[i+1] + gene[i+2]
         )
+
     return amino_acids_chain
 
 def get_amino_acids_chain(gene):
+    """Trouve la séquence d'acide aminé partir d'un gène
+
+    Args:
+        gene (str): gène représenté en arn (suite de U, A, G, C)
+    Returns:
+        amino_acids_chain (list[str]): liste de séquences d'acide aminé sous leur nom complet 
+    """
+    print(gene)
     amino_acids = get_amino_acids(gene)
     amino_acids_chain = []
     for amino_acid in amino_acids[:-1]:
         amino_acids_chain.append(amino_acids_template[amino_acid])
+
     return amino_acids_chain
 
 def get_abbreviated_amino_acids_chain(gene):
@@ -242,7 +275,7 @@ def is_codeboot():
 
 
 if __name__ == '__main__':
-    clear(800, 600) if is_codeboot() else speed(0)
+    #clear(800, 600) if is_codeboot() else speed(0)
 
     dna_strands = [
         dna,
@@ -267,8 +300,8 @@ if __name__ == '__main__':
     for amino_acids_chain in amino_acids_chains_fullname:
         xyz = amino_acids_chain
         x = get_stringify_protein(amino_acids_chain)
-        print(x)
+        #print(x)
 
-    draw_proteins(amino_acids_chains_shorten)
+    # draw_proteins(amino_acids_chains_shorten)
 
-    mainloop() if not is_codeboot() else None
+    # mainloop() if not is_codeboot() else None
