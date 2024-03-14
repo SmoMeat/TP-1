@@ -155,7 +155,7 @@ def get_amino_acids_chain(gene):
     Returns:
         amino_acids_chain (list[str]): liste de séquences d'acide aminé sous leur nom complet 
     """
-    print(gene)
+    
     amino_acids = get_amino_acids(gene)
     amino_acids_chain = []
     for amino_acid in amino_acids[:-1]:
@@ -164,18 +164,46 @@ def get_amino_acids_chain(gene):
     return amino_acids_chain
 
 def get_abbreviated_amino_acids_chain(gene):
+    """Trouve la séquence d'acide aminé (abrégé) à partir d'un gène
+
+    Args:
+        gene (str): gène représenté en arn (suite de U, A, G, C)
+    Returns:
+        amino_acids_names (): liste de séquences d'acide aminé abrégés
+    """
+
     amino_acids = get_amino_acids(gene)
     amino_acids_names = []
+
     for amino_acid in amino_acids[:-1]:
         amino_acids_names.append(amino_acids_letters[amino_acid])
+    
     return amino_acids_names
 
 def get_stringify_protein(amino_acids_chain):
+    """Transforme une liste d'acides aminés en string
+
+    Args:
+        amino_acids_chain (list[str]): liste de séquences d'acide aminé sous leur nom complet
+    Returns:
+        (str): séquences d'acide aminé sous leur nom complet
+    """
     return '-'.join(amino_acids_chain)
 
-def get_stringify_protein_by_gene(gene):
-    amino_acids_chain = get_amino_acids_chain(gene)
-    return '-'.join(amino_acids_chain)
+# def get_stringify_protein_by_gene(gene):
+    # UTILITÉ ?????
+#     """_summary_
+
+#     Args:
+#         gene (_type_): _description_
+
+#     Returns:
+#         _type_: _description_
+#     """
+#     amino_acids_chain = get_amino_acids_chain(gene)
+#     print(amino_acids_chain)
+#     print('-'.join(amino_acids_chain))
+#     return '-'.join(amino_acids_chain)
 
 def draw_protein(x, y, amino_acids_chain, side_length=15):
     """Permet de dessiner une suite d'acides aminés avec Turtle
