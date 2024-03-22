@@ -190,6 +190,14 @@ def get_stringify_protein(amino_acids_chain):
     """
     return '-'.join(amino_acids_chain)
 
+def TEST_get_stringify_protein():
+    assert get_stringify_protein([]) == ''
+    assert get_stringify_protein(['Méthionine (Start)', 'Glycine', 'Arginine']) == 'Méthionine (Start)-Glycine-Arginine'
+    assert get_stringify_protein(['Méthionine (Start)', 'Glycine', 'Arginine']) == 'Méthionine (Start)-Glycine-Arginine'
+
+
+
+
 # def get_stringify_protein_by_gene(gene):
     # UTILITÉ ?????
 #     """_summary_
@@ -254,6 +262,12 @@ def get_genes_by_coordinate(branchs):
 
     return genes
 
+def TEST_get_genes_by_coordinate():
+    assert get_genes_by_coordinate([{'dna': '', 'genes_positions': []}]) == []
+    assert get_genes_by_coordinate([{'dna': 'TACATT', 'genes_positions': [(0, 3)]}])  == ['TACATT']
+    assert get_genes_by_coordinate([{'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}]) == ['TACTTTACT']
+    assert get_genes_by_coordinate([{'dna': 'TACGGGGGGATCGGTACGGATT', 'genes_positions': [(0,9)]}]) == ['TACGGGGGGATC']
+    assert get_genes_by_coordinate([{'dna': 'TACGGGGGGATCGGTACGGGATT', 'genes_positions': [(0,9), (14,20)]}]) == ['TACGGGGGGATC', 'TACGGGATT']
 
 def get_genes_coordinate_from_dna(dna):
     """Trouve toutes les positions de gènes sur un brin d'ADN donné
@@ -270,6 +284,13 @@ def get_genes_coordinate_from_dna(dna):
             get_position_of_ending_codon(dna)
         )
     }
+
+def TEST_get_genes_coordinate_from_dna():
+    assert get_genes_coordinate_from_dna('') == {'dna': '', 'genes_positions': []}
+    assert get_genes_coordinate_from_dna('TACATT') == {'dna': 'TACATT', 'genes_positions': [(0, 3)]}
+    assert get_genes_coordinate_from_dna('AATACTTTACT') == {'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}
+    assert get_genes_coordinate_from_dna('TACGGGGGGATCGGTACGGATT') == {'dna': 'TACGGGGGGATCGGTACGGATT', 'genes_positions': [(0,9)]}
+    assert get_genes_coordinate_from_dna('TACGGGGGGATCGGTACGGGATT') == {'dna': 'TACGGGGGGATCGGTACGGGATT', 'genes_positions': [(0,9), (14,20)]}
 
 def draw_square(x, y, amino_acid, side_length=15):
     """Dessine un carré avec une lettre à l'intérieur
@@ -300,9 +321,14 @@ def is_codeboot():
         return False
     except:
         return True
+    
 
+def run_tests():
+    TEST_get_stringify_protein()
+    TEST_get_genes_by_coordinate()
+    TEST_get_genes_coordinate_from_dna()
 
-if __name__ == '__main__':
+def main():
     #clear(800, 600) if is_codeboot() else speed(0)
 
     dna_strands = [
@@ -333,3 +359,7 @@ if __name__ == '__main__':
     # draw_proteins(amino_acids_chains_shorten)
 
     # mainloop() if not is_codeboot() else None
+        
+if __name__ == '__main__':
+    main()
+    run_tests()
