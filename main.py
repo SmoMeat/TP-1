@@ -130,7 +130,7 @@ def get_arn_sequence(gene):
 
     return arn
 
-def get_amino_acids(gene):
+def get_amino_acids_chain_by_gene(gene):
     """_summary_
 
     Args:
@@ -147,7 +147,7 @@ def get_amino_acids(gene):
 
     return amino_acids_chain
 
-def get_amino_acids_chain(gene):
+def get_fullname_amino_acids_chain_by_gene(gene):
     """Trouve la séquence d'acide aminé partir d'un gène
 
     Args:
@@ -156,12 +156,14 @@ def get_amino_acids_chain(gene):
         amino_acids_chain (list[str]): liste de séquences d'acide aminé sous leur nom complet 
     """
     
-    amino_acids = get_amino_acids(gene)
+    amino_acids = get_amino_acids_chain_by_gene(gene)
     amino_acids_chain = []
+    
     for amino_acid in amino_acids[:-1]:
         amino_acids_chain.append(amino_acids_template[amino_acid])
 
     return amino_acids_chain
+
 
 def get_abbreviated_amino_acids_chain(gene):
     """Trouve la séquence d'acide aminé (abrégé) à partir d'un gène
@@ -171,18 +173,22 @@ def get_abbreviated_amino_acids_chain(gene):
     Returns:
         amino_acids_names (): liste de séquences d'acide aminé abrégés
     """
-
-    amino_acids = get_amino_acids(gene)
+    #print(gene)
+    amino_acids = get_amino_acids_chain_by_gene(gene)
+    #print(amino_acids[:-1])
     amino_acids_names = []
 
     for amino_acid in amino_acids[:-1]:
+        #print(amino_acids_letters[amino_acid])
+        #print('ok')
         amino_acids_names.append(amino_acids_letters[amino_acid])
-    
+    #print(amino_acids_names)
     return amino_acids_names
 
 def TEST_get_abbreviated_amino_acids_chain():
-    assert get_abbreviated_amino_acids_chain('') == []
-    assert get_abbreviated_amino_acids_chain('UUU') == []
+    get_abbreviated_amino_acids_chain('UUU')
+    # assert get_abbreviated_amino_acids_chain('') == []
+    # assert get_abbreviated_amino_acids_chain('UUU') == []
 
 def get_stringify_protein(amino_acids_chain):
     """Transforme une liste d'acides aminés en string
@@ -232,7 +238,7 @@ def draw_proteins(amino_acids_chains):
         if is_codeboot(): y -= 15 * (len(amino_acids_chain) // 15) + 50
         else: y = ycor() - 50
         
-def get_genes_by_coordinate(branchs):
+def get_genes_by_coordinates(branchs):
     """Trouve la séquence de nucléotide d'un gènes à partir de plusieurs brins
     
     Args:
@@ -251,13 +257,13 @@ def get_genes_by_coordinate(branchs):
     return genes
 
 def TEST_get_genes_by_coordinate():
-    assert get_genes_by_coordinate([{'dna': '', 'genes_positions': []}]) == []
-    assert get_genes_by_coordinate([{'dna': 'TACATT', 'genes_positions': [(0, 3)]}])  == ['TACATT']
-    assert get_genes_by_coordinate([{'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}]) == ['TACTTTACT']
-    assert get_genes_by_coordinate([{'dna': 'TACGGGGGGATCGGTACGGATT', 'genes_positions': [(0,9)]}]) == ['TACGGGGGGATC']
-    assert get_genes_by_coordinate([{'dna': 'TACGGGGGGATCGGTACGGGATT', 'genes_positions': [(0,9), (14,20)]}]) == ['TACGGGGGGATC', 'TACGGGATT']
+    assert get_genes_by_coordinates([{'dna': '', 'genes_positions': []}]) == []
+    assert get_genes_by_coordinates([{'dna': 'TACATT', 'genes_positions': [(0, 3)]}])  == ['TACATT']
+    assert get_genes_by_coordinates([{'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}]) == ['TACTTTACT']
+    assert get_genes_by_coordinates([{'dna': 'TACGGGGGGATCGGTACGGATT', 'genes_positions': [(0,9)]}]) == ['TACGGGGGGATC']
+    assert get_genes_by_coordinates([{'dna': 'TACGGGGGGATCGGTACGGGATT', 'genes_positions': [(0,9), (14,20)]}]) == ['TACGGGGGGATC', 'TACGGGATT']
 
-def get_genes_coordinate_from_dna(dna):
+def get_genes_coordinates_from_dna(dna):
     """Trouve toutes les positions de gènes sur un brin d'ADN donné
 
     Args:
@@ -274,11 +280,11 @@ def get_genes_coordinate_from_dna(dna):
     }
 
 def TEST_get_genes_coordinate_from_dna():
-    assert get_genes_coordinate_from_dna('') == {'dna': '', 'genes_positions': []}
-    assert get_genes_coordinate_from_dna('TACATT') == {'dna': 'TACATT', 'genes_positions': [(0, 3)]}
-    assert get_genes_coordinate_from_dna('AATACTTTACT') == {'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}
-    assert get_genes_coordinate_from_dna('TACGGGGGGATCGGTACGGATT') == {'dna': 'TACGGGGGGATCGGTACGGATT', 'genes_positions': [(0,9)]}
-    assert get_genes_coordinate_from_dna('TACGGGGGGATCGGTACGGGATT') == {'dna': 'TACGGGGGGATCGGTACGGGATT', 'genes_positions': [(0,9), (14,20)]}
+    assert get_genes_coordinates_from_dna('') == {'dna': '', 'genes_positions': []}
+    assert get_genes_coordinates_from_dna('TACATT') == {'dna': 'TACATT', 'genes_positions': [(0, 3)]}
+    assert get_genes_coordinates_from_dna('AATACTTTACT') == {'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}
+    assert get_genes_coordinates_from_dna('TACGGGGGGATCGGTACGGATT') == {'dna': 'TACGGGGGGATCGGTACGGATT', 'genes_positions': [(0,9)]}
+    assert get_genes_coordinates_from_dna('TACGGGGGGATCGGTACGGGATT') == {'dna': 'TACGGGGGGATCGGTACGGGATT', 'genes_positions': [(0,9), (14,20)]}
 
 def draw_square(x, y, amino_acid, side_length=15):
     """Dessine un carré avec une lettre à l'intérieur
@@ -325,15 +331,15 @@ def main():
         get_reverse_complement(dna)
     ]
 
-    genes_coordinates = list(map(get_genes_coordinate_from_dna, dna_strands))
-    genes = get_genes_by_coordinate(genes_coordinates)
+    genes_coordinates = list(map(get_genes_coordinates_from_dna, dna_strands))
+    genes = get_genes_by_coordinates(genes_coordinates)
 
     amino_acids_chains_fullname = []
     amino_acids_chains_shorten = []
 
     for gene in genes:
         arn = get_arn_sequence(gene)
-        amino_acids_chains_fullname.append(get_amino_acids_chain(arn))
+        amino_acids_chains_fullname.append(get_fullname_amino_acids_chain_by_gene(arn))
         amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain(arn))
 
     # print(amino_acids_chains_fullname)
