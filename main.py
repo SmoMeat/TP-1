@@ -180,6 +180,10 @@ def get_abbreviated_amino_acids_chain(gene):
     
     return amino_acids_names
 
+def TEST_get_abbreviated_amino_acids_chain():
+    assert get_abbreviated_amino_acids_chain('') == []
+    assert get_abbreviated_amino_acids_chain('UUU') == []
+
 def get_stringify_protein(amino_acids_chain):
     """Transforme une liste d'acides aminés en string
 
@@ -192,26 +196,10 @@ def get_stringify_protein(amino_acids_chain):
 
 def TEST_get_stringify_protein():
     assert get_stringify_protein([]) == ''
+    assert get_stringify_protein(['a', 'b', 'c']) == 'a-b-c'
+    assert get_stringify_protein(['a    a', 'b', '?@#']) == 'a    a-b-?@#'
+    assert get_stringify_protein(['Valine', 'Tryptophane']) == 'Valine-Tryptophane'
     assert get_stringify_protein(['Méthionine (Start)', 'Glycine', 'Arginine']) == 'Méthionine (Start)-Glycine-Arginine'
-    assert get_stringify_protein(['Méthionine (Start)', 'Glycine', 'Arginine']) == 'Méthionine (Start)-Glycine-Arginine'
-
-
-
-
-# def get_stringify_protein_by_gene(gene):
-    # UTILITÉ ?????
-#     """_summary_
-
-#     Args:
-#         gene (_type_): _description_
-
-#     Returns:
-#         _type_: _description_
-#     """
-#     amino_acids_chain = get_amino_acids_chain(gene)
-#     print(amino_acids_chain)
-#     print('-'.join(amino_acids_chain))
-#     return '-'.join(amino_acids_chain)
 
 def draw_protein(x, y, amino_acids_chain, side_length=15):
     """Permet de dessiner une suite d'acides aminés avec Turtle
@@ -327,6 +315,7 @@ def run_tests():
     TEST_get_stringify_protein()
     TEST_get_genes_by_coordinate()
     TEST_get_genes_coordinate_from_dna()
+    TEST_get_abbreviated_amino_acids_chain()
 
 def main():
     #clear(800, 600) if is_codeboot() else speed(0)
