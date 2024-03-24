@@ -11,6 +11,7 @@
 # 5) traduire la suite d'acide-aminé en abréviation
 # 6) afficher avec turtle
 
+
 from bioInfo import adn as dna
 from bioInfo import codons_aa as amino_acids_template
 from bioInfo import lettreAa as amino_acids_letters
@@ -217,16 +218,14 @@ def TEST_get_amino_acids_chain_by_gene():
     assert get_amino_acids_chain_by_gene('AAGCCA') == ['AAG', 'CCA']
     assert get_amino_acids_chain_by_gene('ATTGCCAGCCAGCCAGCC') == ['ATT', 'GCC', 'AGC', 'CAG', 'CCA', 'GCC']
 
-def get_fullname_amino_acids_chain_by_gene(gene):
-    """Trouve la séquence d'acide aminé partir d'un gène sans le codon d'arret
+def get_fullname_amino_acids_chain_by_gene(amino_acids):
+    """Trouve la séquence d'acide aminé sous leur nom complet sans le codon d'arret
 
     Args:
-        gene (str): gène représenté en arn (suite de U, A, G, C)
+        amino_acids (list[str]): liste de séquences d'acides aminés sous forme de triplet de nucléotide (ex: ['AUG', 'GGU', 'UAG'])
     Returns:
-        amino_acids_chain (list[str]): liste de séquences d'acide aminé sous leur nom complet 
+        (list[str]): liste de séquences d'acide aminé sous leur nom complet 
     """
-    
-    amino_acids = get_amino_acids_chain_by_gene(gene)
 
     return list(
         map(
@@ -236,23 +235,21 @@ def get_fullname_amino_acids_chain_by_gene(gene):
     )
 
 def TEST_get_fullname_amino_acids_chain_by_gene():
-    assert get_fullname_amino_acids_chain_by_gene('') == []
-    assert get_fullname_amino_acids_chain_by_gene('UUU') == []
-    assert get_fullname_amino_acids_chain_by_gene('CGCUGA') == ['Arginine']
-    assert get_fullname_amino_acids_chain_by_gene('UUUUAA') == ['Phénylalanine']
-    assert get_fullname_amino_acids_chain_by_gene('ACAGAAUGCUAG') == ['Thrénine', 'Glutamate', 'Cystéine']
+    assert get_fullname_amino_acids_chain_by_gene([]) == []
+    assert get_fullname_amino_acids_chain_by_gene(['UUU']) == []
+    assert get_fullname_amino_acids_chain_by_gene(['CGC', 'UGA']) == ['Arginine']
+    assert get_fullname_amino_acids_chain_by_gene(['UUU', 'UAA']) == ['Phénylalanine']
+    assert get_fullname_amino_acids_chain_by_gene(['ACA', 'GAA', 'UGC', 'UAG']) == ['Thrénine', 'Glutamate', 'Cystéine']
 
 
-def get_abbreviated_amino_acids_chain_by_gene(gene):
-    """Trouve la séquence d'acide aminé (abrégé) à partir d'un gène sans le codon d'arret
+def get_abbreviated_amino_acids_chain_by_gene(amino_acids):
+    """Trouve la séquence d'acide aminé sous leur nom abrégé sans le codon d'arret
 
     Args:
-        gene (str): gène représenté en arn (suite de U, A, G, C)
+        amino_acids (list[str]): liste de séquences d'acides aminés sous forme de triplet de nucléotide (ex: ['AUG', 'GGU', 'UAG'])
     Returns:
-        amino_acids_names (): liste de séquences d'acide aminé abrégés
+        (list[str]): liste de séquences d'acide aminé abrégés
     """
-
-    amino_acids = get_amino_acids_chain_by_gene(gene)
 
     return list(
         map(
@@ -262,11 +259,11 @@ def get_abbreviated_amino_acids_chain_by_gene(gene):
     )
 
 def TEST_get_abbreviated_amino_acids_chain():
-    assert get_abbreviated_amino_acids_chain_by_gene('') == []
-    assert get_abbreviated_amino_acids_chain_by_gene('UUU') == []
-    assert get_abbreviated_amino_acids_chain_by_gene('CGCUGA') == ['R']
-    assert get_abbreviated_amino_acids_chain_by_gene('UUUUAA') == ['F']
-    assert get_abbreviated_amino_acids_chain_by_gene('ACAGAAUGCUAG') == ['T', 'E', 'C']
+    assert get_abbreviated_amino_acids_chain_by_gene([]) == []
+    assert get_abbreviated_amino_acids_chain_by_gene(['UUU']) == []
+    assert get_abbreviated_amino_acids_chain_by_gene(['CGC', 'UGA']) == ['R']
+    assert get_abbreviated_amino_acids_chain_by_gene(['UUU', 'UAA']) == ['F']
+    assert get_abbreviated_amino_acids_chain_by_gene(['ACA', 'GAA', 'UGC', 'UAG']) == ['T', 'E', 'C']
 
 def get_stringify_protein(amino_acids_chain):
     """Transforme une liste d'acides aminés en string
@@ -315,8 +312,13 @@ def draw_proteins(amino_acids_chains):
         draw_protein(x, y, amino_acids_chain)
         if is_codeboot(): y -= 15 * (len(amino_acids_chain) // 15) + 50
         else: y = ycor() - 50
+
+# class BranchDto:
+#     def __init__(self, dna: str, genes_positions: list[tuple[int, int]]):
+#         self.dna = dna
+#         self.genes_positions = genes_positions
         
-def get_genes_by_coordinates(branchs):
+def get_genes_by_coordinates(branchs): # TODO: make branchs a DTO
     """Trouve la séquence de nucléotide d'un gènes à partir de plusieurs brins
     
     Args:
@@ -348,7 +350,7 @@ def get_genes_coordinates_from_dna(dna):
     Args:
         dna (str): l'adn sous forme de string (suite de A, T, C, G)
     Returns:
-        ? (dict): contient le brin d'adn utilisé et les couples de positions de gènes 
+        (dict): contient le brin d'adn utilisé et les couples de positions de gènes 
     """
     return {
         "dna": dna,
@@ -425,19 +427,14 @@ def main():
     amino_acids_chains_shorten = []
 
     for gene in genes:
-        arn = get_arn_sequence(gene)
-        #amino_acids_chain = get_amino_acids_chain_by_gene(get_arn_sequence(gene))
-        amino_acids_chains_fullname.append(get_fullname_amino_acids_chain_by_gene(arn))
-        amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain_by_gene(arn))
-
-    # print(amino_acids_chains_fullname)
-    # print(amino_acids_chains_shorten)
-
+        amino_acids = get_amino_acids_chain_by_gene(get_arn_sequence(gene))
+        amino_acids_chains_fullname.append(get_fullname_amino_acids_chain_by_gene(amino_acids))
+        amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain_by_gene(amino_acids))
 
     for amino_acids_chain in amino_acids_chains_fullname:
-        xyz = amino_acids_chain
-        x = get_stringify_protein(amino_acids_chain)
-        #print(x)
+        stringify_protein = get_stringify_protein(amino_acids_chain)
+        print(stringify_protein)
+
 
     # draw_proteins(amino_acids_chains_shorten)
 
@@ -446,3 +443,5 @@ def main():
 if __name__ == '__main__':
     main()
     run_tests()
+
+
