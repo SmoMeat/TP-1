@@ -19,7 +19,7 @@ from turtle import pd as pendown
 from turtle import *
 import math
 
-
+# Équivalent à antisens(brinAdn)
 def get_reverse_complement(dna):
     """Génère le brin inversé avec les nucléotides complémentaires
 
@@ -29,6 +29,7 @@ def get_reverse_complement(dna):
         reverse_complement (str): le 2e brin d'adn complémentaire et inversé
     """
     reverse_complement = ''
+
     for nucleotide in dna.upper():
         if nucleotide == 'A':
             reverse_complement = 'T' + reverse_complement
@@ -39,10 +40,22 @@ def get_reverse_complement(dna):
         elif nucleotide == 'G':
             reverse_complement = 'C' + reverse_complement
         else:
-            raise ValueError ("L'adn contient des caracteres autres que 'A', 'T', 'C' ou 'G'")
+            raise ValueError("L'adn contient des caracteres autres que 'A', 'T', 'C' ou 'G'")
 
     return reverse_complement
-    
+
+def TEST_get_reverse_complement():
+    assert get_reverse_complement('') == ''
+    assert get_reverse_complement('TG') == 'CA'
+    assert get_reverse_complement('ATCG') == 'CGAT'
+    assert get_reverse_complement('CGATTGCCAGCCAGCCAGCCAG') == 'CTGGCTGGCTGGCTGGCAATCG'
+    try:
+        get_reverse_complement('XYZ$%#')
+        raise AssertionError
+    except:
+        pass
+
+# Équivalent à trouveDebut(brinAdn)
 def get_position_of_starting_codon(dna):
     """Trouve dans un brin d'adn la position de tous les codons de début ('TAC')
 
@@ -52,12 +65,22 @@ def get_position_of_starting_codon(dna):
         starting_codon_position (list[int]): liste avec la position de tous les codons de débuts
     """
     starting_codon_position = []
+    
     for i in range(len(dna)-2):
         codon = dna[i] + dna[i+1] + dna[i+2]
         if codon == 'TAC':
             starting_codon_position.append(i)
+
     return starting_codon_position
 
+def TEST_get_position_of_starting_codon():
+    assert get_position_of_starting_codon('') == []
+    assert get_position_of_starting_codon('TAC') == [0]
+    assert get_position_of_starting_codon('GGGGGGTAC') == [6]
+    assert get_position_of_starting_codon('76w898bzfhga') == []
+    assert get_position_of_starting_codon('TACTACGGGGTAC') == [0, 3, 10]
+
+# Équivalent à trouveFin(brinAdn)
 def get_position_of_ending_codon(dna):
     """Trouve dans un brin d'adn la position de tous les codons de fin ('ATT', 'ATC, 'ACT')
 
@@ -67,12 +90,22 @@ def get_position_of_ending_codon(dna):
         ending_codon_position (list[int]): liste avec la position de tous les codons de fin
     """
     starting_codon_position = []
+
     for i in range(len(dna)-2):
         codon = dna[i] + dna[i+1] + dna[i+2]
         if codon in ['ATT', 'ATC', 'ACT']:
             starting_codon_position.append(i)
+
     return starting_codon_position
 
+def TEST_get_position_of_ending_codon():
+    assert get_position_of_ending_codon('') == []
+    assert get_position_of_ending_codon('ATT') == [0]
+    assert get_position_of_ending_codon('ACGCATGCA') == []
+    assert get_position_of_ending_codon('GGGGGATTC') == [5]
+    assert get_position_of_ending_codon('ATTATCACT') == [0, 3, 6]
+
+# Équivalent à trouveGene(debut, fin)
 def get_genes_coordinates(starting_codons, ending_codons):
     """Trouve la position de tous les gènes valides parmis plusieurs couples possibles
     
@@ -83,6 +116,7 @@ def get_genes_coordinates(starting_codons, ending_codons):
         genes_coordinates (list[tuple]): liste contenant tous les couples de gènes valides
     """
     genes_coordinates = []
+
     for starting_codon in starting_codons:
         for ending_codon in ending_codons:
             lenght = ending_codon - starting_codon
@@ -96,6 +130,13 @@ def get_genes_coordinates(starting_codons, ending_codons):
     
     return genes_coordinates
 
+def TEST_get_genes_coordinates():
+    assert get_genes_coordinates([], []) == []
+    assert get_genes_coordinates([0], [3]) == [(0, 3)]
+    assert get_genes_coordinates([0], [1, 2, 3, 4, 5]) == [(0, 3)]
+    assert get_genes_coordinates([0, 10], [6, 40]) == [(0, 6), (10, 40)]
+    assert get_genes_coordinates([2, 11, 30, 41], [5, 33]) == [(2, 5), (30, 33)]
+
 def get_genes(dna, genes_coordinates):
     """Renvoie tous les gènes d'un brin d'adn
 
@@ -106,12 +147,22 @@ def get_genes(dna, genes_coordinates):
         genes (list[str]): contient tous les gènes sous forme d'ADN
     """
     genes = []
+
     for gene_coordinate in genes_coordinates:
         start = gene_coordinate[0]
         end = gene_coordinate[1]
         genes.append(dna[start:end+3])
+
     return genes
 
+def TEST_get_genes():
+    assert get_genes('', []) == []
+    assert get_genes('ATCGATACGTCAG', []) == [] 
+    assert get_genes('GGTACATTC', [(2, 5)]) == ['TACATT']
+    assert get_genes('TACATCGGGGTACACTGGGG', [(0, 3), (10, 13)]) == ['TACATC', 'TACACT']
+    assert get_genes('AAABBBCCCDDDEEEFFFGGGHHH', [(2, 6), (0, 21)]) == ['ABBBCCC', 'AAABBBCCCDDDEEEFFFGGGHHH']
+
+# Équivalent à transcrire(brinAdn)
 def get_arn_sequence(gene):
     """Transforme une séquence d'ADN (un gène) en ARN
 
@@ -121,17 +172,29 @@ def get_arn_sequence(gene):
         arn (str): gène représenté en arn (suite de U, A, G, C)
     """
     arn = ''
+
     for nucleotide in gene:
         if nucleotide == 'A':  arn += 'U'
         elif nucleotide == 'T': arn += 'A'
         elif nucleotide == 'C': arn += 'G'
         elif nucleotide == 'G': arn += 'C'
-        else: raise ValueError
+        else: raise ValueError("L'adn contient des nucléotides non-reconnus")
 
     return arn
 
+def TEST_get_arn_sequence():
+    assert get_arn_sequence('') == ''
+    assert get_arn_sequence('ATCG') == 'UAGC'
+    assert get_arn_sequence('AGCCAGCGAA') == 'UCGGUCGCUU'
+    assert get_arn_sequence('AGCCGAGTGCCAGC') == 'UCGGCUCACGGUCG'
+    try: # S'assure qu'une erreur est bien détectée
+        get_arn_sequence('XYZ$%#')
+        raise AssertionError
+    except:
+        pass
+
 def get_amino_acids_chain_by_gene(gene):
-    """_summary_
+    """Sépare en codons de 3 nucléotides c'est-à-dire en acides aminés le gène
 
     Args:
         gene (str): gène représenté en arn (suite de U, A, G, C)
@@ -147,8 +210,15 @@ def get_amino_acids_chain_by_gene(gene):
 
     return amino_acids_chain
 
+def TEST_get_amino_acids_chain_by_gene():
+    assert get_amino_acids_chain_by_gene('') == []
+    assert get_amino_acids_chain_by_gene('ATG') == ['ATG']
+    assert get_amino_acids_chain_by_gene('X$%') == ['X$%']
+    assert get_amino_acids_chain_by_gene('AAGCCA') == ['AAG', 'CCA']
+    assert get_amino_acids_chain_by_gene('ATTGCCAGCCAGCCAGCC') == ['ATT', 'GCC', 'AGC', 'CAG', 'CCA', 'GCC']
+
 def get_fullname_amino_acids_chain_by_gene(gene):
-    """Trouve la séquence d'acide aminé partir d'un gène
+    """Trouve la séquence d'acide aminé partir d'un gène sans le codon d'arret
 
     Args:
         gene (str): gène représenté en arn (suite de U, A, G, C)
@@ -157,38 +227,46 @@ def get_fullname_amino_acids_chain_by_gene(gene):
     """
     
     amino_acids = get_amino_acids_chain_by_gene(gene)
-    amino_acids_chain = []
-    
-    for amino_acid in amino_acids[:-1]:
-        amino_acids_chain.append(amino_acids_template[amino_acid])
 
-    return amino_acids_chain
+    return list(
+        map(
+            lambda amino_acid: amino_acids_template[amino_acid],
+            amino_acids[:-1]
+        )
+    )
+
+def TEST_get_fullname_amino_acids_chain_by_gene():
+    assert get_fullname_amino_acids_chain_by_gene('') == []
+    assert get_fullname_amino_acids_chain_by_gene('UUU') == []
+    assert get_fullname_amino_acids_chain_by_gene('CGCUGA') == ['Arginine']
+    assert get_fullname_amino_acids_chain_by_gene('UUUUAA') == ['Phénylalanine']
+    assert get_fullname_amino_acids_chain_by_gene('ACAGAAUGCUAG') == ['Thrénine', 'Glutamate', 'Cystéine']
 
 
-def get_abbreviated_amino_acids_chain(gene):
-    """Trouve la séquence d'acide aminé (abrégé) à partir d'un gène
+def get_abbreviated_amino_acids_chain_by_gene(gene):
+    """Trouve la séquence d'acide aminé (abrégé) à partir d'un gène sans le codon d'arret
 
     Args:
         gene (str): gène représenté en arn (suite de U, A, G, C)
     Returns:
         amino_acids_names (): liste de séquences d'acide aminé abrégés
     """
-    #print(gene)
-    amino_acids = get_amino_acids_chain_by_gene(gene)
-    #print(amino_acids[:-1])
-    amino_acids_names = []
 
-    for amino_acid in amino_acids[:-1]:
-        #print(amino_acids_letters[amino_acid])
-        #print('ok')
-        amino_acids_names.append(amino_acids_letters[amino_acid])
-    #print(amino_acids_names)
-    return amino_acids_names
+    amino_acids = get_amino_acids_chain_by_gene(gene)
+
+    return list(
+        map(
+            lambda amino_acid: amino_acids_letters[amino_acid],
+            amino_acids[:-1]
+        )
+    )
 
 def TEST_get_abbreviated_amino_acids_chain():
-    get_abbreviated_amino_acids_chain('UUU')
-    # assert get_abbreviated_amino_acids_chain('') == []
-    # assert get_abbreviated_amino_acids_chain('UUU') == []
+    assert get_abbreviated_amino_acids_chain_by_gene('') == []
+    assert get_abbreviated_amino_acids_chain_by_gene('UUU') == []
+    assert get_abbreviated_amino_acids_chain_by_gene('CGCUGA') == ['R']
+    assert get_abbreviated_amino_acids_chain_by_gene('UUUUAA') == ['F']
+    assert get_abbreviated_amino_acids_chain_by_gene('ACAGAAUGCUAG') == ['T', 'E', 'C']
 
 def get_stringify_protein(amino_acids_chain):
     """Transforme une liste d'acides aminés en string
@@ -250,6 +328,7 @@ def get_genes_by_coordinates(branchs):
         genes (list[str]): les gènes représentés sous forme de suite de nucléotide
     """
     genes = []
+
     for branch in branchs:
         for gene in get_genes(branch['dna'], branch['genes_positions']):
             genes.append(gene)
@@ -318,10 +397,18 @@ def is_codeboot():
     
 
 def run_tests():
+    TEST_get_reverse_complement()
+    TEST_get_position_of_starting_codon()
+    TEST_get_position_of_ending_codon()
+    TEST_get_genes_coordinates()
+    TEST_get_genes()
+    TEST_get_arn_sequence()
+    TEST_get_amino_acids_chain_by_gene()
+    TEST_get_fullname_amino_acids_chain_by_gene()
+    TEST_get_abbreviated_amino_acids_chain()
     TEST_get_stringify_protein()
     TEST_get_genes_by_coordinate()
     TEST_get_genes_coordinate_from_dna()
-    TEST_get_abbreviated_amino_acids_chain()
 
 def main():
     #clear(800, 600) if is_codeboot() else speed(0)
@@ -339,8 +426,9 @@ def main():
 
     for gene in genes:
         arn = get_arn_sequence(gene)
+        #amino_acids_chain = get_amino_acids_chain_by_gene(get_arn_sequence(gene))
         amino_acids_chains_fullname.append(get_fullname_amino_acids_chain_by_gene(arn))
-        amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain(arn))
+        amino_acids_chains_shorten.append(get_abbreviated_amino_acids_chain_by_gene(arn))
 
     # print(amino_acids_chains_fullname)
     # print(amino_acids_chains_shorten)
