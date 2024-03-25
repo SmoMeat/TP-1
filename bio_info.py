@@ -1,24 +1,162 @@
-# TP1 - IFT 1015
+"""bio_info.py : Analyse un brin d'adn
 
-# le premier brin a 3 gènes
-# et le deuxieme en a un seul
+Ce programme permet à partir d'un brin d'adn de trouver toutes les protéines encodées. Dans
+une premier temps, le brin et son complément sont analysés pour identifier les gènes qu'ils
+contiennent et ces gènes sont ensuite traduits en chaines d'acides aminés qui forment les
+protéines.
 
-# 1) générer le brin complémentaire  OK!
-# 2) trouver les gènes (commence par TAC et fini par ATT, ATC ou ACT)
-# * le premier brin se lit de gauche à droite, le second de droit à gauche
-# 3) transformer les gènes en ARN (A->U, T->A, C->G, G->C)
-# 4) transformer la suite d'ARN en acide-aminé
-# 5) traduire la suite d'acide-aminé en abréviation
-# 6) afficher avec turtle
-
-
-from bioInfo import adn as dna
-from bioInfo import codons_aa as amino_acids_template
-from bioInfo import lettreAa as amino_acids_letters
+@Date: 28 mars 2024
+@Authors: Mathieu Ducharme & Loic Buisson
+@Contacts: mathieu.ducharme@umontreal.ca &
+@Matricules: 20297456 &
+"""
+from turtle import *
 from turtle import pu as penup
 from turtle import pd as pendown
-from turtle import *
-import math
+
+
+DNA = "TCGACTGCGATCGACAGCCAGCGAAGCCAGCCAGCCGATACCCAGCCAGCCAGCCAGCGAAGCCAGCCAGCCGATACCCAGCCAGCCAGCCA\
+GCGACGGCCAGCCAGCCAGCCAGCGAAGCCAGCCAGCCGAGTGCCAGCCAGCCAGCCAGCGAACTGCGATCGACAGCCAGCGAAGCCAGCCAGCCGAAT\
+GCCAGCCAGCCAGCCAGCGAAGCCAGCCAGCCGATATTCAGCCAGCCAGCCAGCGAACACTCTTCGACAGCCAGCGAAGCCAGCCAGCCGATATTCAGC\
+CAGCCAGCCAGCGAACTCGACACTCTTCGACAGCCAGCGAAGCCAGCCAGCCGATTGCCAGCCAGCCAGCCAGCGAAGCCAGCCAGCCGATTGCCAGCC\
+AGCATCCCAGCGATACCCAGCCAGCCAGCCAGCGAAGCCAGCCAGCCGATTGCCAGCCAGCCAGCCAGCGAACTGCGATCGACAGCCAGCGAAGCCAGC\
+CAGCCGATTGCCAGCCAGCCAGCCAGCGAACTCGTCTGCGTTCGACAGCCAGCGAAGCCAGCCAGCCGATTGCCAGCCAGCCAGCCAGCGAAGCCAGCC\
+AGCCGATTGCCAGCCAGCCAGCCAGCGATTGCCAGCCAGCCAGCCAGCGAAGCCAGCCAGCCGATTGCCAGCCAGCCAGCCAGCGAACTGCGATCGACA\
+GCCAGCGAAGCCAGCCAGCCGTATGCCAGCCAGCATCCCAGCGA"
+
+AMINO_ACIDS_FULLNAME = {
+    "UUU": "Phénylalanine",
+    "UUC": "Phénylalanine",
+    "UUA": "Leucine",
+    "UUG": "Leucine",
+    "CUU": "Leucine",
+    "CUC": "Leucine",
+    "CUA": "Leucine",
+    "CUG": "Leucine",
+    "AUU": "Isoleucine",
+    "AUC": "Isoleucine",
+    "AUA": "Isoleucine",
+    "AUG": "Méthionine (Start)",
+    "GUU": "Valine",
+    "GUC": "Valine",
+    "GUA": "Valine",
+    "GUG": "Valine",
+    "UCU": "Sérine",
+    "UCC": "Sérine",
+    "UCA": "Sérine",
+    "UCG": "Sérine",
+    "CCU": "Proline",
+    "CCC": "Proline",
+    "CCA": "Proline",
+    "CCG": "Proline",
+    "ACU": "Thrénine",
+    "ACC": "Thrénine",
+    "ACA": "Thrénine",
+    "ACG": "Thrénine",
+    "GCU": "Alanine",
+    "GCC": "Alanine",
+    "GCA": "Alanine",
+    "GCG": "Alanine",
+    "UAU": "Tyrosine",
+    "UAC": "Tyrosine",
+    "UAA": "Stop",
+    "UAG": "Stop",
+    "CAU": "Histidine",
+    "CAC": "Histidine",
+    "CAA": "Glutamine",
+    "CAG": "Glutamine",
+    "AAU": "Asparagine",
+    "AAC": "Asparagine",
+    "AAA": "Lysine",
+    "AAG": "Lysine",
+    "GAU": "Aspartate",
+    "GAC": "Aspartate",
+    "GAA": "Glutamate",
+    "GAG": "Glutamate",
+    "UGU": "Cystéine",
+    "UGC": "Cystéine",
+    "UGA": "Stop",
+    "UGG": "Tryptophane",
+    "CGU": "Arginine",
+    "CGC": "Arginine",
+    "CGA": "Arginine",
+    "CGG": "Arginine",
+    "AGU": "Sérine",
+    "AGC": "Sérine",
+    "AGA": "Arginine",
+    "AGG": "Arginine",
+    "GGU": "Glycine",
+    "GGC": "Glycine",
+    "GGA": "Glycine",
+    "GGG": "Glycine"
+}
+
+AMINO_ACIDS_ABBREVIATED = {
+    "UUU": "F",
+    "UUC": "F",
+    "UUA": "L",
+    "UUG": "L",
+    "CUU": "L",
+    "CUC": "L",
+    "CUA": "L",
+    "CUG": "L",
+    "AUU": "I",
+    "AUC": "I",
+    "AUA": "I",
+    "AUG": "M",
+    "GUU": "V",
+    "GUC": "V",
+    "GUA": "V",
+    "GUG": "V",
+    "UCU": "S",
+    "UCC": "S",
+    "UCA": "S",
+    "UCG": "S",
+    "CCU": "P",
+    "CCC": "P",
+    "CCA": "P",
+    "CCG": "P",
+    "ACU": "T",
+    "ACC": "T",
+    "ACA": "T",
+    "ACG": "T",
+    "GCU": "A",
+    "GCC": "A",
+    "GCA": "A",
+    "GCG": "A",
+    "UAU": "Y",
+    "UAC": "Y",
+    "UAA": "*",
+    "UAG": "*",
+    "CAU": "H",
+    "CAC": "H",
+    "CAA": "Q",
+    "CAG": "Q",
+    "AAU": "N",
+    "AAC": "N",
+    "AAA": "K",
+    "AAG": "K",
+    "GAU": "D",
+    "GAC": "D",
+    "GAA": "E",
+    "GAG": "E",
+    "UGU": "C",
+    "UGC": "C",
+    "UGA": "*",
+    "UGG": "W",
+    "CGU": "R",
+    "CGC": "R",
+    "CGA": "R",
+    "CGG": "R",
+    "AGU": "S",
+    "AGC": "S",
+    "AGA": "R",
+    "AGG": "R",
+    "GGU": "G",
+    "GGC": "G",
+    "GGA": "G",
+    "GGG": "G"
+}
 
 # Équivalent à antisens(brinAdn)
 def get_reverse_complement(dna):
@@ -45,15 +183,14 @@ def get_reverse_complement(dna):
 
     return reverse_complement
 
-def TEST_get_reverse_complement():
+def test_get_reverse_complement():
     assert get_reverse_complement('') == ''
     assert get_reverse_complement('TG') == 'CA'
     assert get_reverse_complement('ATCG') == 'CGAT'
     assert get_reverse_complement('CGATTGCCAGCCAGCCAGCCAG') == 'CTGGCTGGCTGGCTGGCAATCG'
     try:
         get_reverse_complement('XYZ$%#')
-        raise AssertionError
-    except:
+    except ValueError:
         pass
 
 # Équivalent à trouveDebut(brinAdn)
@@ -74,7 +211,7 @@ def get_position_of_starting_codon(dna):
 
     return starting_codon_position
 
-def TEST_get_position_of_starting_codon():
+def test_get_position_of_starting_codon():
     assert get_position_of_starting_codon('') == []
     assert get_position_of_starting_codon('TAC') == [0]
     assert get_position_of_starting_codon('GGGGGGTAC') == [6]
@@ -99,7 +236,7 @@ def get_position_of_ending_codon(dna):
 
     return starting_codon_position
 
-def TEST_get_position_of_ending_codon():
+def test_get_position_of_ending_codon():
     assert get_position_of_ending_codon('') == []
     assert get_position_of_ending_codon('ATT') == [0]
     assert get_position_of_ending_codon('ACGCATGCA') == []
@@ -131,7 +268,7 @@ def get_genes_coordinates(starting_codons, ending_codons):
     
     return genes_coordinates
 
-def TEST_get_genes_coordinates():
+def test_get_genes_coordinates():
     assert get_genes_coordinates([], []) == []
     assert get_genes_coordinates([0], [3]) == [(0, 3)]
     assert get_genes_coordinates([0], [1, 2, 3, 4, 5]) == [(0, 3)]
@@ -156,7 +293,7 @@ def get_genes(dna, genes_coordinates):
 
     return genes
 
-def TEST_get_genes():
+def test_get_genes():
     assert get_genes('', []) == []
     assert get_genes('ATCGATACGTCAG', []) == [] 
     assert get_genes('GGTACATTC', [(2, 5)]) == ['TACATT']
@@ -175,7 +312,7 @@ def get_arn_sequence(gene):
     arn = ''
 
     for nucleotide in gene:
-        if nucleotide == 'A':  arn += 'U'
+        if nucleotide == 'A':   arn += 'U'
         elif nucleotide == 'T': arn += 'A'
         elif nucleotide == 'C': arn += 'G'
         elif nucleotide == 'G': arn += 'C'
@@ -183,15 +320,14 @@ def get_arn_sequence(gene):
 
     return arn
 
-def TEST_get_arn_sequence():
+def test_get_arn_sequence():
     assert get_arn_sequence('') == ''
     assert get_arn_sequence('ATCG') == 'UAGC'
     assert get_arn_sequence('AGCCAGCGAA') == 'UCGGUCGCUU'
     assert get_arn_sequence('AGCCGAGTGCCAGC') == 'UCGGCUCACGGUCG'
     try: # S'assure qu'une erreur est bien détectée
         get_arn_sequence('XYZ$%#')
-        raise AssertionError
-    except:
+    except ValueError:
         pass
 
 def get_amino_acids_chain_by_gene(gene):
@@ -211,7 +347,7 @@ def get_amino_acids_chain_by_gene(gene):
 
     return amino_acids_chain
 
-def TEST_get_amino_acids_chain_by_gene():
+def test_get_amino_acids_chain_by_gene():
     assert get_amino_acids_chain_by_gene('') == []
     assert get_amino_acids_chain_by_gene('ATG') == ['ATG']
     assert get_amino_acids_chain_by_gene('X$%') == ['X$%']
@@ -229,12 +365,12 @@ def get_fullname_amino_acids_chain_by_gene(amino_acids):
 
     return list(
         map(
-            lambda amino_acid: amino_acids_template[amino_acid],
+            lambda amino_acid: AMINO_ACIDS_FULLNAME[amino_acid],
             amino_acids[:-1]
         )
     )
 
-def TEST_get_fullname_amino_acids_chain_by_gene():
+def test_get_fullname_amino_acids_chain_by_gene():
     assert get_fullname_amino_acids_chain_by_gene([]) == []
     assert get_fullname_amino_acids_chain_by_gene(['UUU']) == []
     assert get_fullname_amino_acids_chain_by_gene(['CGC', 'UGA']) == ['Arginine']
@@ -253,12 +389,12 @@ def get_abbreviated_amino_acids_chain_by_gene(amino_acids):
 
     return list(
         map(
-            lambda amino_acid: amino_acids_letters[amino_acid],
+            lambda amino_acid: AMINO_ACIDS_ABBREVIATED[amino_acid],
             amino_acids[:-1]
         )
     )
 
-def TEST_get_abbreviated_amino_acids_chain():
+def test_get_abbreviated_amino_acids_chain():
     assert get_abbreviated_amino_acids_chain_by_gene([]) == []
     assert get_abbreviated_amino_acids_chain_by_gene(['UUU']) == []
     assert get_abbreviated_amino_acids_chain_by_gene(['CGC', 'UGA']) == ['R']
@@ -275,7 +411,7 @@ def get_stringify_protein(amino_acids_chain):
     """
     return '-'.join(amino_acids_chain)
 
-def TEST_get_stringify_protein():
+def test_get_stringify_protein():
     assert get_stringify_protein([]) == ''
     assert get_stringify_protein(['a', 'b', 'c']) == 'a-b-c'
     assert get_stringify_protein(['a    a', 'b', '?@#']) == 'a    a-b-?@#'
@@ -337,7 +473,7 @@ def get_genes_by_coordinates(branchs): # TODO: make branchs a DTO
 
     return genes
 
-def TEST_get_genes_by_coordinate():
+def test_get_genes_by_coordinate():
     assert get_genes_by_coordinates([{'dna': '', 'genes_positions': []}]) == []
     assert get_genes_by_coordinates([{'dna': 'TACATT', 'genes_positions': [(0, 3)]}])  == ['TACATT']
     assert get_genes_by_coordinates([{'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}]) == ['TACTTTACT']
@@ -360,7 +496,7 @@ def get_genes_coordinates_from_dna(dna):
         )
     }
 
-def TEST_get_genes_coordinate_from_dna():
+def test_get_genes_coordinate_from_dna():
     assert get_genes_coordinates_from_dna('') == {'dna': '', 'genes_positions': []}
     assert get_genes_coordinates_from_dna('TACATT') == {'dna': 'TACATT', 'genes_positions': [(0, 3)]}
     assert get_genes_coordinates_from_dna('AATACTTTACT') == {'dna': 'AATACTTTACT', 'genes_positions': [(2,8)]}
@@ -394,30 +530,30 @@ def is_codeboot():
     try:
         import sys
         return False
-    except:
+    except ModuleNotFoundError as _:
         return True
     
 
 def run_tests():
-    TEST_get_reverse_complement()
-    TEST_get_position_of_starting_codon()
-    TEST_get_position_of_ending_codon()
-    TEST_get_genes_coordinates()
-    TEST_get_genes()
-    TEST_get_arn_sequence()
-    TEST_get_amino_acids_chain_by_gene()
-    TEST_get_fullname_amino_acids_chain_by_gene()
-    TEST_get_abbreviated_amino_acids_chain()
-    TEST_get_stringify_protein()
-    TEST_get_genes_by_coordinate()
-    TEST_get_genes_coordinate_from_dna()
+    test_get_reverse_complement()
+    test_get_position_of_starting_codon()
+    test_get_position_of_ending_codon()
+    test_get_genes_coordinates()
+    test_get_genes()
+    test_get_arn_sequence()
+    test_get_amino_acids_chain_by_gene()
+    test_get_fullname_amino_acids_chain_by_gene()
+    test_get_abbreviated_amino_acids_chain()
+    test_get_stringify_protein()
+    test_get_genes_by_coordinate()
+    test_get_genes_coordinate_from_dna()
 
 def main():
-    #clear(800, 600) if is_codeboot() else speed(0)
+    clear(800, 600) if is_codeboot() else speed(0)
 
     dna_strands = [
-        dna,
-        get_reverse_complement(dna)
+        DNA,
+        get_reverse_complement(DNA)
     ]
 
     genes_coordinates = list(map(get_genes_coordinates_from_dna, dna_strands))
@@ -436,12 +572,10 @@ def main():
         print(stringify_protein)
 
 
-    # draw_proteins(amino_acids_chains_shorten)
+    draw_proteins(amino_acids_chains_shorten)
 
-    # mainloop() if not is_codeboot() else None
-        
+    mainloop() if not is_codeboot() else None
+
 if __name__ == '__main__':
-    main()
     run_tests()
-
-
+    main()
