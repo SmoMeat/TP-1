@@ -6,8 +6,8 @@ identifier les gènes qu'ils contiennent et ces gènes sont ensuite traduits en
 chaines d'acides aminés qui forment les protéines.
 
 @Date: 28 mars 2024
-@Authors: Mathieu Ducharme & Loic Buisson
-@Contacts: mathieu.ducharme@umontreal.ca &
+@Authors: Mathieu Ducharme & Loic Buisson-Fechter
+@Contacts: mathieu.ducharme@umontreal.ca & loic.buisson-fechter@umontreal.ca
 @Matricules: 20297456 &
 """
 
@@ -540,7 +540,7 @@ def draw_letter(amino_acid, side_length):
 
     Args:
         amino_acid (str): Lettre à dessiner
-        side_length (int): La taille du carré représentant un acide aminé (défaut=15)
+        side_length (int): La taille du carré représentant un acide aminé
     Returns:
         None
     """
@@ -562,7 +562,7 @@ def draw_square(index, side_length):
 
     Args:
         index (int): Indice du carré à dessiner
-        side_length (int): La taille du carré représentant un acide aminé (défaut=15)
+        side_length (int): La taille du carré représentant un acide aminé
     Returns:
         None
     """
@@ -627,7 +627,7 @@ def main():
 
     for amino_acids_chain in amino_acids_chains_fullname:
         stringify_protein = get_stringify_protein(amino_acids_chain)
-        print(stringify_protein)
+        print(stringify_protein + '\n')
 
     draw_proteins(amino_acids_chains_shorten)
 
